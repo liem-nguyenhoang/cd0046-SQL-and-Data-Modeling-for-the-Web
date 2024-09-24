@@ -89,7 +89,11 @@ class Show(db.Model):
 #----------------------------------------------------------------------------#
 
 def format_datetime(value, format='medium'):
-  date = dateutil.parser.parse(value)
+  if isinstance(value, str):
+    date = dateutil.parser.parse(value)
+  else:
+    date = value
+
   if format == 'full':
       format="EEEE MMMM, d, y 'at' h:mma"
   elif format == 'medium':
@@ -161,8 +165,8 @@ def show_venue(venue_id):
   data.website = data.website_link
 
   upcoming_shows = []
-  past_shows = []
 
+  past_shows = []
   for show in data.shows:
     if show.start_time > datetime.now():
       upcoming_shows.append(show)
@@ -171,6 +175,8 @@ def show_venue(venue_id):
       
   data.upcoming_shows = upcoming_shows
   data.past_shows = past_shows
+  data.upcoming_shows_count = len(upcoming_shows)
+  data.past_shows_count = len(past_shows)
 
   return render_template('pages/show_venue.html', venue=data)
 
